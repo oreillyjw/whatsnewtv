@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '5om4(0+^ivmd1x+2pn#vyy#d$=+*cg=mu^t)9d$k1gjq-xft-t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
 ROOT_URLCONF = 'whatsnewtv.urls'
@@ -73,7 +74,7 @@ WSGI_APPLICATION = 'whatsnewtv.wsgi.application'
 
 ASGI_APPLICATION = "whatsnewtv.routing.application"
 
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+# PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
@@ -126,9 +127,10 @@ STATIC_URL = '/static/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-STATIC_ROOT = '/static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 #
-# Extra places for collectstatic to find static files.
+# # Extra places for collectstatic to find static files.
 # STATICFILES_DIRS = (
 #     os.path.join(BASE_DIR, 'social/static'),
 # )
