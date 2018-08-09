@@ -73,6 +73,8 @@ WSGI_APPLICATION = 'whatsnewtv.wsgi.application'
 
 ASGI_APPLICATION = "whatsnewtv.routing.application"
 
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
