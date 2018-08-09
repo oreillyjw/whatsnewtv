@@ -1,0 +1,243 @@
+{% extends "social/layout.html" %}
+{% load static %}
+{% load utils %}
+{% load humanize %}
+
+{% block title %}
+{% if data.title %}{{data.title}}{% else %}{{data.name}}{%endif%}
+{% endblock %}
+
+
+{% block customcss %}
+<!-- Custom styles for this template -->
+<link href="{% static 'css/details.css' %}" rel="stylesheet">
+<link href="{% static 'css/product-grid.css' %}" rel="stylesheet">
+<link href="{% static 'utils/star-rating.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block customjs %}
+<script src="{% static 'utils/star-rating.min.js' %}" charset="utf-8" type="text/javascript"></script>
+<script src="{% static 'utils/textcomplete.min.js' %}" charset="utf-8" type="text/javascript"></script>
+<script src="{% static 'javascript/details.js' %}" charset="utf-8" type="text/javascript"></script>
+{% endblock %}
+
+{% block body %}
+  <div class="row">
+    <div class="col-md-5">
+      {% if data.backdrop_path %}
+        <img class="card-img-top" src="http://image.tmdb.org/t/p/w500/{{data.backdrop_path}}" alt="{{data.name}}">
+      {% elif data.poster_path %}
+        <img class="card-img-top" src="http://image.tmdb.org/t/p/w500/{{data.poster_path}}" alt="{{data.name}}">
+      {% endif %}
+    </div>
+    <div class="col-md-7">
+      <div class="card details">
+        <div class="card-body">
+          {% if request.user.is_authenticated %}
+            <div class="heart-circle {%if favorited %} favorited{%endif%}"
+                 data-favorited="{{favorited|yesno:'1,0'}}"
+                 data-type="{{type}}"
+                 data-id="{{data.id}}">
+              <i class="fa fa-2x fa-heart" aria-hidden="true"></i>
+            </div>
+          {% endif %}
+          {% if data.title %}
+            <h1 class="card-title page-title">{{data.title}} ({{data.release_date|parse_date|date:"Y"}})</h1>
+          {% else %}
+            <h1 class="card-title page-title">{{data.name}}
+              {% if data.first_air_date %}<small class="text-muted">
+                ({{data.first_air_date|parse_date|date:"Y"}} -
+              {% endif %}
+              {% if data.in_production %}Present)</small>
+              {% elif data.last_air_date%}{{data.last_air_date|parse_date|date:"Y"}})</small>
+              {% endif %}
+            </h1>
+          {% endif %}
+          {% if data.belongs_to_collection %}
+          <div>Collection: {{data.belongs_to_collection.name}}</div>
+          {% endif %}
+          <p class="card-text">
+            <h5>Overview</h5>
+            {{data.overview}}
+          </p>
+          <p class="card-text">
+            <h5>Details</h5>
+            <div class="row">
+              <div class="col-sm-6">
+                <ul>
+                  {% if data.release_date %}
+                    <li>Released: {{data.release_date|parse_date|date:"Y"}}</li>
+                  {% endif %}
+                  {% if data.vote_average %}
+                    <li>
+                      Rating: {{data.vote_average}}/10
+                    </li>
+                  {% endif %}
+                  {% if data.runtime %}
+                    <li>
+                      Runtime: {{data.runtime}} min
+                    </li>
+                  {% endif %}
+                  {% if data.tagline %}
+                    <li>
+                      Tag Line: <i>{{data.tagline}}</i>
+                    </li>
+                  {% endif %}
+                  {% if data.revenue %}
+                    <li>
+                      Revenue: {{data.revenue|currency}}
+                    </li>
+                  {% endif %}
+                  {% if data.budget %}
+                    <li>
+                      Budget: {{data.budget|currency}}
+                    </li>
+                  {% endif %}
+                  {% if data.number_of_episodes %}
+                    <li>
+                      Num. of Episodes: {{data.number_of_episodes}}
+                    </li>
+                  {% endif %}
+                  {% if data.number_of_seasons %}
+                    <li>
+                      Num. of Seasons: {{data.number_of_seasons}}
+                    </li>
+                  {% endif %}
+                </ul>
+              </div>
+              <div class="col-sm-6">
+                <ul>
+                  {% if data.genres %}
+                    <li>Genres:
+                      <ul>
+                        {% for genre in data.genres %}
+                          <li>{{genre.name}}</li>
+                        {% endfor %}
+                      </ul>
+                    </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      {% if request.user.is_authenticated and show_comment %}
+        <div id="add-comment">
+          <h3>Add Review</h3>
+          <form action="{% url 'details' type=type id=data.id %}" method="POST">
+            <input class="form-control form-control-lg" type="text" placeholder="Title" name="title" maxlength="64">
+            <input id="new-star-rating"
+                   name="new-rating"
+                   class="rating rating-loading"
+                   data-min="0"
+                   data-max="10"
+                   data-step="0.5">
+            <div class="form-group">
+              <textarea class="form-control"
+                        id="commentTextarea"
+                        name="comment-text"
+                        rows="3"
+                        cols="80"
+                        spellcheck="true"></textarea>
+              <div class="text-muted text-right">@ :Tag user</div>
+            </div>
+            <input type="hidden" name="tags" value="">
+            <input type="hidden" name="moviedb" value="{{data.id}}" >
+            <button type="submit" class="btn btn-primary">Submit</button>
+            {% csrf_token %}
+          </form>
+        </div>
+        <br>
+      {% endif %}
+      <h4>Reviews</h4>
+      {% for comment in comments %}
+        <div class="row">
+          <div class="col-12">
+            {% include "social/comments.html" with comment=comment %}
+          </div>
+        </div>
+      {% empty %}
+        <div class="no-comments text-center">No comments found</div>
+      {% endfor %}
+      <br>
+      {% include "social/paging_controls.html" with pages=comments page_identifier="comments_page" %}
+    </div>
+  </div>
+  <br>
+
+  {% if data.seasons|length > 0 %}
+    <div class="row">
+      <div class="col-12">
+        <h4>Seasons</h4>
+        <div class="container-fluid">
+          <div class="row seasons">
+            {% for item in data.seasons %}
+              <div class="col-md-2">
+                  <div class="card mb-2 box-shadow">
+                  {% if item.poster_path %}
+                    <img class="card-img-top"
+                         src="http://image.tmdb.org/t/p/w300/{{item.poster_path}}"
+                         alt="{{item.name}}">
+                  {% endif %}
+                  <div class="card-body">
+                    {% if item.title %}
+                      <h5 class="card-title">{{item.title}}{% if item.air_date %} (
+                        {{ item.air_date|parse_date|date:"Y" }}
+                        ){%endif%}</h5>
+                    {% else %}
+                      <h5 class="card-title">
+                          {{item.name}}
+                          {% if item.air_date %} ({{item.air_date|parse_date|date:"Y" }}){%endif%}</h5>
+                    {% endif %}
+                    {% if item.episode_count %}
+                      <div class="card-text">
+                          Episode Count: {{item.episode_count}}
+                      </div>
+                    {% endif %}
+                    {% if item.overview %}
+                      <div class="card-text">
+                        <p class="collapse" id="collapseSummary-{{item.id}}">
+                            {{item.overview}}
+                        </p>
+                        <a class="collapsed"
+
+                        data-toggle="collapse"
+
+                        href="#collapseSummary-{{item.id}}"
+
+                        aria-expanded="false"
+
+                         aria-controls="collapseSummary-{{item.id}}"></a>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+  {% if recommendations|length > 0 %}
+    <div class="row">
+      <div class="col-12">
+        <h4>Recommendations</h4>
+        <div class="container-fluid">
+          <div class="row">
+            {% for item in recommendations %}
+              {% include "social/product-grid.html" with item=item type=type %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+
+{% endblock %}

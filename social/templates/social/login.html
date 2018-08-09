@@ -1,0 +1,47 @@
+{% extends "social/layout.html" %}
+{% load static %}
+
+{% block customcss %}
+<!-- Custom styles for this template -->
+  <link href="{% static 'utils/floating-labels.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<form class="form-signin" action="{{post_url}}" method="post" >
+  <div class="text-center mb-4">
+    <h1 class="h3 mb-3 font-weight-normal">{{type}}</h1>
+  </div>
+
+  {% if register == None %}
+    <div class="form-label-group">
+      <input type="text"
+             id="inputUserName"
+             class="form-control"
+             placeholder="Username"
+             name="username" required autofocus>
+      <label for="inputUserName">Username</label>
+    </div>
+    <div class="form-label-group">
+      <input type="password" id="inputPassword" class="form-control" name="password" placeholder="Password" required>
+      <label for="inputPassword">Password</label>
+    </div>
+  {% else %}
+  <!-- the SignUpForm extension of the UserCreationForm -->
+  {% for field in form %}
+    <div class="form-label-group">
+      {{ field }}
+      {{ field.label_tag }}
+      {% if field.help_text %}
+        <small style="color: grey">{{ field.help_text | safe }}</small>
+      {% endif %}
+    </div>
+  {% endfor %}
+  {% endif %}
+
+  {% csrf_token %}
+  <button class="btn btn-lg btn-primary btn-block" type="submit">{{type}}</button>
+  {% if backlink %}
+    <a href="{{backlink.link}}" class="btn btn-secondary btn-block">{{backlink.text}}</a>
+  {% endif %}
+</form>
+{% endblock %}

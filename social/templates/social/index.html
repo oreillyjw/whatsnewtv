@@ -1,0 +1,55 @@
+{% extends "social/layout.html" %}
+{% load static %}
+
+{% block customcss %}
+<!-- Custom styles for this template -->
+  <link href="{% static 'css/product-grid.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+
+{% if upcoming|length > 0 %}
+<div class="row">
+  <h2>Your Upcoming Shows and Movies</h2>
+</div>
+<div class="row">
+  <div class="py-3">
+    <div class="container-fluid">
+      <div class="row">
+        {% for show in upcoming %}
+              {% include "social/product-grid.html" with item=show.data type=show.type upcoming=show.upcoming %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+<div class="row">
+  <h2>Trending Movies</h2>
+</div>
+<div class="row">
+  <div class="py-3">
+    <div class="container-fluid">
+      <div class="row">
+        {% for movie in movies %}
+            {% include "social/product-grid.html" with item=movie type='movie' %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <h2>Trending TV Shows</h2>
+</div>
+<div class="row">
+  <div class="py-3">
+    <div class="container-fluid">
+      <div class="row">
+        {% for show in tvshows %}
+          {% include "social/product-grid.html" with item=show type='tv' %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

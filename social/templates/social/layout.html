@@ -1,0 +1,144 @@
+{% load static %}
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}What's New TV{% endblock %}</title>
+        <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon.ico' %}"/>
+        <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+        <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+        <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+          crossorigin="anonymous">
+        <link rel="stylesheet" href="{% static 'fontawesome/css/font-awesome.min.css' %}">
+        <link rel="stylesheet" href="{% static 'css/nav.css' %}">
+
+        {% block customcss %}
+        {% endblock %}
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="/">
+            <img src="{% static 'img/tvimage.png' %}"
+              width="30" height="30" class="d-inline-block align-top" alt="What's New TV">
+              What's New TV
+          </a>
+          <!-- This button is present make the page responsive and have the ability to sign in/out on mobile -->
+          <button class="navbar-toggler"
+                  type="button" data-toggle="collapse"
+                  data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                  aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <!-- Left most clickable sections -->
+            <ul class="navbar-nav mr-auto">
+              <form action="{% url 'search' %}" method="post" class="form-inline my-2 my-lg-0">
+                {% csrf_token %}
+                <input class="form-control mr-sm-2 search"
+                       name="search-term"
+                       type="search"
+                       placeholder="Search"
+                       aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0 d-none" type="submit">Search</button>
+              </form>
+            </ul>
+            <ul class="navbar-nav">
+
+               <!-- determine if the user is signed in or not and display option
+                    if they are signed in give them a signout option and
+                    if not signed in them give them the option to do so -->
+                {% if request.user.is_authenticated %}
+                  <li class="nav-item dropdown notification-wrapper">
+                    <a id="notification-icon"
+                      class="notification fa fa-stack nav-link "
+                      href="#" role="button" data-toggle="dropdown"
+                      aria-haspopup="true" aria-expanded="false"
+                      data-user="{{request.user.id}}"
+                      >
+                      <i class="fa fa-stack fa-stack-2x"></i>
+                      <i class="fa fa-lg fa-bell-o fa-stack-1x" aria-hidden="true"></i>
+                    </a>
+
+                     <div id="notifcation-dropdown" class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                         <div class="dropdown-item" ></div>
+                     </div>
+                  </li>
+                  <li class="nav-item dropdown">
+                     <a class="nav-link dropdown-toggle"
+                     href="#" id="navbarDropdown"
+                     role="button" data-toggle="dropdown"
+                     aria-haspopup="true" aria-expanded="false">
+                       Account
+                     </a>
+                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                       <span class="dropdown-item disabled" >Hello, {{request.user.username}}</span>
+                       <a class="dropdown-item" href="{% url 'account' %}">View Profile</a>
+                       <div class="dropdown-divider"></div>
+                       <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                     </div>
+                   </li>
+                {% else %}
+                <li class="nav-item">
+                  <a
+                    class="nav-link"
+                    href="{% url 'login' %}" role="button" > Login
+                  </a>
+                </li>
+                {% endif %}
+            </ul>
+          </div>
+        </nav>
+
+        <div class="container-fluid">
+
+        <br>
+        <!-- general place to display errors -->
+        {% for error in errors %}
+          <div class="alert alert-danger" role="alert">{{ error }}</div>
+        {% endfor %}
+
+        {% block body %}
+        {% endblock %}
+        <div class="row footer">
+          <div class="col-12">
+            <div class="d-flex align-items-end flex-column">
+              <img src="{% static 'img/408x161-powered-by-moviedb.png' %}" alt="Powered By MovieDB" height="50px">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+              integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+              crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+              integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+              crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+              integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+              crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+      <script src="{% static 'utils/csrf.js' %}" charset="utf-8"></script>
+      <script id="notifications-template" type="text/x-handlebars-template">
+        {% verbatim %}
+            {{#each notifications}}
+            <a class="dropdown-item text-left" href="{{this.url}}" >
+                <i>{{ this.from }}</i> tagged you in a comment<br>
+                regarding {{# if this.moviedb_data.title }}
+                movie: <b>{{this.moviedb_data.title}}
+                {{else if this.moviedb_data.name }}
+                tv show: <b>{{this.moviedb_data.name}}
+                {{/if}}</b>
+            </a>
+            {{/each}}
+        {% endverbatim %}
+      </script>
+      <script src="{% static 'javascript/nav.js' %}" charset="utf-8"></script>
+
+      {% block customjs %}
+      {% endblock %}
+    </body>
+</html>

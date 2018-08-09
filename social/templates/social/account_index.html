@@ -1,0 +1,60 @@
+{% extends "social/layout.html" %}
+{% load static %}
+
+
+{% block customcss %}
+<!-- Custom styles for this template -->
+<link href="{% static 'css/details.css' %}" rel="stylesheet">
+<link href="{% static 'css/product-grid.css' %}" rel="stylesheet">
+<link href="{% static 'utils/star-rating.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block customjs %}
+<script src="{% static 'utils/star-rating.min.js' %}" charset="utf-8" type="text/javascript"></script>
+<script src="{% static 'javascript/details.js' %}" charset="utf-8" type="text/javascript"></script>
+{% endblock %}
+
+{% block body %}
+  <div class="row">
+    <div class="col-12">
+
+    <h4>Your Favorites</h4>
+      <div class="row">
+        <div class="col-12">
+          <div class="list-group">
+            {% for favorite in favorites %}
+              <a class="list-group-item list-group-item-action"
+                 href="{% url 'details' type=favorite.moviedb.type id=favorite.moviedb.moviedb_id %}">
+                 {{favorite.moviedb}}
+              </a>
+            {% empty %}
+              <div class="no-comments text-center">You have not favorited any movies or tv shows</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  {% include "social/paging_controls.html" with pages=favorites page_identifier="favorites_page" %}
+
+  <br>
+  <div class="row">
+    <div class="col-12">
+
+    <h4>Your Reviews</h4>
+    {% for comment in comments %}
+      <div class="row">
+        <div class="col-12">
+          {% include "social/comments.html" with comment=comment include_moviedb_info=include_comment_info %}
+        </div>
+      </div>
+    {% empty %}
+      <div class="no-comments text-center">You have reviewed no products</div>
+    {% endfor %}
+    </div>
+  </div>
+  <br>
+  {% include "social/paging_controls.html" with pages=comments page_identifier="comments_page" %}
+
+{% endblock %}

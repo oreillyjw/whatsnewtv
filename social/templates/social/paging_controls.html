@@ -1,0 +1,37 @@
+{% if pages.has_other_pages %}
+<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-center flex-wrap">
+    {% if pages.has_previous %}
+      <li class="page-item" >
+        <a class="page-link"
+           href="?{{page_identifier}}={{ pages.previous_page_number }}{{extra_query|striptags}}">
+           &raquo;
+         </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link" >&laquo;</span></li>
+    {% endif %}
+    {% for i in pages.paginator.page_range %}
+      {% if pages.number == i %}
+        <li class="page-item active">
+          <span class="page-link" >{{ i }} <span class="sr-only">(current)</span></span>
+        </li>
+      {% else %}
+        <li class="page-item" >
+          <a class="page-link"  href="?{{page_identifier}}={{ i }}{{extra_query|striptags}}">{{ i }}</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+    {% if pages.has_next %}
+      <li class="page-item" >
+        <a class="page-link"
+           href="?{{page_identifier}}={{ pages.next_page_number }}{{extra_query|striptags}}">
+           &raquo;
+         </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span  class="page-link">&raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}

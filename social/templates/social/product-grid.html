@@ -1,0 +1,63 @@
+{% load utils %}
+{% load humanize %}
+
+<div class="col-md-2">
+    <div class="card mb-2 box-shadow">
+    {% if upcoming.air_date %}
+    <div class="card-header">
+      Next Air Time: <br>{{upcoming.air_date|naturalday}}
+    </div>
+    {% endif %}
+    {% if type %}
+      <a href="{% url 'details' type=type id=item.id %}">
+    {% elif item.media_type|ifinlist:"tv|movie"  %}
+      <a href="{% url 'details' type=item.media_type id=item.id %}">
+    {% endif %}
+      {% if item.poster_path %}
+        <img class="card-img-top" src="http://image.tmdb.org/t/p/w300/{{item.poster_path}}" >
+      {% elif item.profile_path %}
+        <img class="card-img-top" src="http://image.tmdb.org/t/p/w300/{{item.profile_path}}">
+      {% endif %}
+    {% if type %}
+      </a>
+    {% elif item.media_type|ifinlist:"tv|movie"  %}
+      </a>
+    {% endif %}
+    <div class="card-body">
+      {% if type %}
+        <a class="card-title" href="{% url 'details' type=type id=item.id %}">
+      {% elif item.media_type|ifinlist:"tv|movie"  %}
+        <a  class="card-title" href="{% url 'details' type=item.media_type id=item.id %}">
+      {% endif %}
+      {% if item.title %}
+        <h5 class="card-title">{{item.title}}</h5>
+      {% else %}
+        <h5 class="card-title">{{item.name}}</h5>
+      {% endif %}
+      {% if type %}
+        </a>
+      {% elif item.media_type|ifinlist:"tv|movie"  %}
+        </a>
+      {% endif %}
+      {% if item.overview %}
+        <div class="card-text">
+          <p class="collapse" id="collapseSummary-{{item.id}}">
+              {{item.overview}}
+          </p>
+          <a class="collapsed"
+             data-toggle="collapse"
+             href="#collapseSummary-{{item.id}}"
+             aria-expanded="false"
+             aria-controls="collapseSummary-{{item.id}}"></a>
+        </div>
+      {% endif %}
+      {% if item.vote_average > 0 %}
+      <div class="d-flex align-items-end flex-column">
+        <small class="text-muted">
+            {{item.vote_average}}/10
+        </small>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
